@@ -108,6 +108,14 @@ const HONOR_BITWARDEN_AUTOFILL_ATTRIBUTE = new KeyDefinition(
   },
 );
 
+const ENABLE_VISIBILITY_RECHECK = new KeyDefinition(
+  AUTOFILL_SETTINGS_DISK_LOCAL,
+  "enableVisibilityRecheck",
+  {
+    deserializer: (value: boolean) => value ?? false,
+  },
+);
+
 const ENABLE_BASIC_AUTH_RESPONSE = new UserKeyDefinition(
   AUTOFILL_SETTINGS_DISK,
   "enableBasicAuthResponse",
@@ -172,6 +180,8 @@ export abstract class AutofillSettingsServiceAbstraction {
   setHonorBitwardenIgnoreAttribute: (newValue: boolean) => Promise<void>;
   honorBitwardenAutofillAttribute$: Observable<boolean>;
   setHonorBitwardenAutofillAttribute: (newValue: boolean) => Promise<void>;
+  enableVisibilityRecheck$: Observable<boolean>;
+  setEnableVisibilityRecheck: (newValue: boolean) => Promise<void>;
   enableBasicAuthResponse$: Observable<boolean>;
   setEnableBasicAuthResponse: (newValue: boolean) => Promise<void>;
   enableContextMenu$: Observable<boolean>;
@@ -219,6 +229,9 @@ export class AutofillSettingsService implements AutofillSettingsServiceAbstracti
 
   private honorBitwardenAutofillAttributeState: GlobalState<boolean>;
   readonly honorBitwardenAutofillAttribute$: Observable<boolean>;
+
+  private enableVisibilityRecheckState: GlobalState<boolean>;
+  readonly enableVisibilityRecheck$: Observable<boolean>;
 
   private enableBasicAuthResponseState: ActiveUserState<boolean>;
   readonly enableBasicAuthResponse$: Observable<boolean>;
@@ -323,6 +336,11 @@ export class AutofillSettingsService implements AutofillSettingsServiceAbstracti
       map((x) => x ?? false),
     );
 
+    this.enableVisibilityRecheckState = this.stateProvider.getGlobal(ENABLE_VISIBILITY_RECHECK);
+    this.enableVisibilityRecheck$ = this.enableVisibilityRecheckState.state$.pipe(
+      map((x) => x ?? false),
+    );
+
     this.enableBasicAuthResponseState = this.stateProvider.getActive(ENABLE_BASIC_AUTH_RESPONSE);
     this.enableBasicAuthResponse$ = this.enableBasicAuthResponseState.state$.pipe(
       map((x) => x ?? false),
@@ -405,6 +423,10 @@ export class AutofillSettingsService implements AutofillSettingsServiceAbstracti
 
   async setHonorBitwardenAutofillAttribute(newValue: boolean): Promise<void> {
     await this.honorBitwardenAutofillAttributeState.update(() => newValue);
+  }
+
+  async setEnableVisibilityRecheck(newValue: boolean): Promise<void> {
+    await this.enableVisibilityRecheckState.update(() => newValue);
   }
 
   async setEnableBasicAuthResponse(newValue: boolean): Promise<void> {

@@ -160,6 +160,7 @@ export class AutofillComponent implements OnInit {
     enableBasicAuthResponse: new FormControl(),
     clearClipboard: new FormControl(),
     defaultUriMatch: new FormControl(),
+    enableVisibilityRecheck: new FormControl(),
   });
 
   protected isDefaultUriMatchDisabledByPolicy = false;
@@ -339,6 +340,23 @@ export class AutofillComponent implements OnInit {
       .pipe(takeUntilDestroyed(this.destroyRef))
       .subscribe((value) => {
         void this.domainSettingsService.setEnableFillAssist(value);
+      });
+
+    const enableVisibilityRecheck = await firstValueFrom(
+      this.autofillSettingsService.enableVisibilityRecheck$,
+    );
+
+    this.additionalOptionsForm.controls.enableVisibilityRecheck.patchValue(
+      enableVisibilityRecheck,
+      {
+        emitEvent: false,
+      },
+    );
+
+    this.additionalOptionsForm.controls.enableVisibilityRecheck.valueChanges
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe((value) => {
+        void this.autofillSettingsService.setEnableVisibilityRecheck(value);
       });
 
     const honorBitwardenIgnoreAttribute = await firstValueFrom(

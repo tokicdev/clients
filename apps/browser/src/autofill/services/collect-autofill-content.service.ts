@@ -103,6 +103,7 @@ export class CollectAutofillContentService implements CollectAutofillContentServ
   private honorBitwardenIgnoreAttribute = false;
   private honorBitwardenAutofillAttribute = false;
   private readonly attributeSettingsFetched: Promise<void>;
+  private enableVisibilityRecheck = false;
 
   private readonly nonInputFormFieldTags = new Set(["textarea", "select"]);
   private readonly ignoredInputTypes = new Set([
@@ -197,6 +198,7 @@ export class CollectAutofillContentService implements CollectAutofillContentServ
     this.honorBitwardenIgnoreAttribute = settings.honorBitwardenIgnoreAttribute === true;
     this.honorBitwardenAutofillAttribute = settings.honorBitwardenAutofillAttribute === true;
     this.formFieldQueryString = this.buildFormFieldQueryString();
+    this.enableVisibilityRecheck = settings.enableVisibilityRecheck === true;
   }
 
   /**
@@ -651,6 +653,42 @@ export class CollectAutofillContentService implements CollectAutofillContentServ
   }
 
   /**
+   * Rechecks visibility of a field that was not viewable at first scan, to catch
+   * modals/animations that settle without causing a DOM mutation or an
+   * IntersectionObserver threshold crossing.
+   */
+  private scheduleVisibilityRecheck(element: ElementWithOpId<FormFieldElement>) {
+    globalThis.setTimeout(async () => {
+      const field = this.autofillFieldElements.get(element);
+      if (!field || !element.isConnected || field.viewable) {
+        return;
+      }
+
+      field.viewable = await this.domElementVisibilityService.isElementViewable(element);
+
+      if (field.viewable) {
+        globalThis.requestAnimationFrame(() => {
+          globalThis.requestAnimationFrame(() => {
+            if (!element.isConnected) {
+              return;
+            }
+
+            const currentField = this.autofillFieldElements.get(element);
+            if (!currentField) {
+              return;
+            }
+
+            this.setupOverlayOnField(element, currentField);
+            this.intersectionObserver.unobserve(element);
+          });
+        });
+
+        return;
+      }
+    }, 400);
+  }
+
+  /**
    * Queries the DOM for all the forms elements and
    * returns a collection of AutofillForm objects.
    * @returns {Record<string, AutofillForm>}
@@ -885,6 +923,10 @@ export class CollectAutofillContentService implements CollectAutofillContentServ
     if (!autofillFieldBase.viewable) {
       this.elementInitializingIntersectionObserver.add(element);
       this.intersectionObserver.observe(element);
+
+      if (this.enableVisibilityRecheck) {
+        this.scheduleVisibilityRecheck(element);
+      }
     }
 
     if (elementIsSpanElement(element)) {

@@ -1485,6 +1485,12 @@
   "honorDataBitwardenAutofillAttributeHint": {
     "message": "Use any span elements that a website marks with the `data-bwautofill` attribute."
   },
+  "enableVisibilityRecheckLabel": {
+    "message": "Recheck hidden fields for autofill"
+  },
+  "enableVisibilityRecheckHint": {
+    "message": "Checks hidden fields again after a short delay to handle long animations."
+  },
   "enableBasicAuthResponseLabel": {
     "message": "Autofill browser login prompts",
     "description": "Label for the setting that lets the extension respond to HTTP basic authentication prompts shown by the browser"

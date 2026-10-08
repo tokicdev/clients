@@ -357,6 +357,21 @@
             <input formControlName="enableAutoTotpCopy" bitCheckbox id="totp" type="checkbox" />
             <bit-label for="totp">{{ "enableAutoTotpCopy" | i18n }}</bit-label>
           </bit-form-control>
+          <bit-form-control>
+            <input
+              formControlName="enableVisibilityRecheck"
+              bitCheckbox
+              id="enable-visibility-recheck"
+              type="checkbox"
+            />
+            <bit-label for="enable-visibility-recheck">
+              {{ "enableVisibilityRecheckLabel" | i18n }}
+            </bit-label>
+
+            <bit-hint class="tw-text-sm">
+              {{ "enableVisibilityRecheckHint" | i18n }}
+            </bit-hint>
+          </bit-form-control>
           <bit-form-field
             id="clearClipboardField"
             [disableMargin]="isDefaultUriMatchDisabledByPolicy"

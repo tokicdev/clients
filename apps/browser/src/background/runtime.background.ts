@@ -239,12 +239,21 @@ export default class RuntimeBackground {
         return targetingRulesForUrl;
       }
       case "getBitwardenAutofillAttributeSettings": {
-        const [honorBitwardenIgnoreAttribute, honorBitwardenAutofillAttribute] = await Promise.all([
+        const [
+          honorBitwardenIgnoreAttribute,
+          honorBitwardenAutofillAttribute,
+          enableVisibilityRecheck,
+        ] = await Promise.all([
           firstValueFrom(this.autofillSettingsService.honorBitwardenIgnoreAttribute$),
           firstValueFrom(this.autofillSettingsService.honorBitwardenAutofillAttribute$),
+          firstValueFrom(this.autofillSettingsService.enableVisibilityRecheck$),
         ]);
 
-        return { honorBitwardenIgnoreAttribute, honorBitwardenAutofillAttribute };
+        return {
+          honorBitwardenIgnoreAttribute,
+          honorBitwardenAutofillAttribute,
+          enableVisibilityRecheck,
+        };
       }
       case "authResult": {
         if (!(await isValidVaultReferrer(this.environmentService, msg.referrer))) {
