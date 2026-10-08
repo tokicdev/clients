@@ -96,7 +96,7 @@ const HONOR_BITWARDEN_IGNORE_ATTRIBUTE = new KeyDefinition(
   AUTOFILL_SETTINGS_DISK_LOCAL,
   "honorBitwardenIgnoreAttribute",
   {
-    deserializer: (value: boolean) => value ?? false,
+    deserializer: (value: boolean) => value ?? true,
   },
 );
 
